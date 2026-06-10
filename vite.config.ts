@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/a2ui-support-copilot-demo/',
+  base: '/a2ui-demo/',
   plugins: [react()],
   test: {
     environment: 'jsdom',

@@ -26,7 +26,7 @@ npm run dev
 发布地址：
 
 ```text
-https://<github-username>.github.io/a2ui-support-copilot-demo/
+https://alfred-bot-001.github.io/a2ui-demo/
 ```
 
 ## 验证
