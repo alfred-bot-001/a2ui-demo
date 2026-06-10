@@ -28,6 +28,17 @@ interface TimelineItem {
   status: 'ok' | 'warning' | 'danger' | 'neutral'
 }
 
+interface ChecklistItem {
+  title: string
+  detail: string
+  status: 'ok' | 'warning' | 'danger' | 'neutral'
+}
+
+interface DocumentGuideItem {
+  title: string
+  detail: string
+}
+
 const actionIcons = {
   refresh: RefreshCw,
   ticket: TicketCheck,
@@ -73,6 +84,57 @@ function asStringList(value: JsonValue | undefined): string[] {
   }
 
   return value.filter((item): item is string => typeof item === 'string')
+}
+
+function asChecklistItems(value: JsonValue | undefined): ChecklistItem[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value.flatMap((item) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      return []
+    }
+
+    const candidate = item as Record<string, JsonValue>
+    if (
+      typeof candidate.title !== 'string' ||
+      typeof candidate.detail !== 'string' ||
+      typeof candidate.status !== 'string'
+    ) {
+      return []
+    }
+
+    return [
+      {
+        title: candidate.title,
+        detail: candidate.detail,
+        status: candidate.status as ChecklistItem['status'],
+      },
+    ]
+  })
+}
+
+function asDocumentGuideItems(value: JsonValue | undefined): DocumentGuideItem[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value.flatMap((item) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      return []
+    }
+
+    const candidate = item as Record<string, JsonValue>
+    if (
+      typeof candidate.title !== 'string' ||
+      typeof candidate.detail !== 'string'
+    ) {
+      return []
+    }
+
+    return [{ title: candidate.title, detail: candidate.detail }]
+  })
 }
 
 function statusText(status: string): string {
@@ -203,11 +265,14 @@ function renderByType(
     }
 
     case 'RiskSummary': {
+      const title = component.title
+        ? resolveValue(component.title, dataModel, '风险原因摘要')
+        : '风险原因摘要'
       const level = String(resolveValue(component.level, dataModel, '未知'))
       const reasons = asStringList(resolveValue(component.reasons, dataModel, []))
       return (
         <section className="panel risk-panel">
-          <h2>风险原因摘要</h2>
+          <h2>{title}</h2>
           <div className="risk-heading">
             <ShieldCheck aria-hidden="true" size={18} />
             <strong>{level}</strong>
@@ -217,6 +282,48 @@ function renderByType(
               <li key={reason}>{reason}</li>
             ))}
           </ul>
+        </section>
+      )
+    }
+
+    case 'Checklist': {
+      const items = asChecklistItems(resolveValue(component.items, dataModel, []))
+      return (
+        <section className="panel">
+          <h2>{resolveValue(component.title, dataModel, '')}</h2>
+          <ul className="checklist">
+            {items.map((item) => (
+              <li className={item.status} key={item.title}>
+                <CheckCircle2 aria-hidden="true" size={17} />
+                <div>
+                  <strong>{item.title}</strong>
+                  <p>{item.detail}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    case 'DocumentGuide': {
+      const items = asDocumentGuideItems(
+        resolveValue(component.items, dataModel, []),
+      )
+      return (
+        <section className="panel">
+          <h2>{resolveValue(component.title, dataModel, '')}</h2>
+          <div className="document-guide">
+            {items.map((item) => (
+              <article key={item.title}>
+                <FileUp aria-hidden="true" size={17} />
+                <div>
+                  <strong>{item.title}</strong>
+                  <p>{item.detail}</p>
+                </div>
+              </article>
+            ))}
+          </div>
         </section>
       )
     }
@@ -246,6 +353,17 @@ function renderByType(
                 <span>{field.label}</span>
                 {field.type === 'textarea' ? (
                   <textarea placeholder={field.placeholder} rows={3} />
+                ) : field.type === 'select' ? (
+                  <select defaultValue="">
+                    <option disabled value="">
+                      请选择
+                    </option>
+                    {field.options?.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
                 ) : (
                   <input
                     type={field.type === 'file' ? 'file' : 'text'}

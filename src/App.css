@@ -372,6 +372,76 @@
   padding-left: 20px;
 }
 
+.checklist {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.checklist li {
+  align-items: start;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto 1fr;
+  padding: 11px;
+}
+
+.checklist li.ok {
+  border-color: var(--success-border);
+}
+
+.checklist li.warning {
+  border-color: var(--warning-border);
+}
+
+.checklist li.danger {
+  border-color: var(--danger-border);
+}
+
+.checklist svg {
+  color: var(--text-soft);
+  margin-top: 1px;
+}
+
+.checklist strong,
+.document-guide strong {
+  color: var(--text-strong);
+}
+
+.checklist p,
+.document-guide p {
+  color: var(--text-muted);
+  margin: 4px 0 0;
+}
+
+.document-guide {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.document-guide article {
+  align-items: start;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: auto 1fr;
+  min-height: 108px;
+  padding: 11px;
+}
+
+.document-guide svg {
+  color: var(--text-soft);
+  margin-top: 1px;
+}
+
 .detail-list {
   display: grid;
   gap: 10px;
@@ -409,6 +479,7 @@
 }
 
 .evidence-form input,
+.evidence-form select,
 .evidence-form textarea {
   background: var(--field);
   border: 1px solid var(--border);
@@ -424,6 +495,7 @@
 }
 
 .evidence-form input:focus,
+.evidence-form select:focus,
 .evidence-form textarea:focus {
   border-color: var(--focus);
   box-shadow: 0 0 0 3px var(--focus-ring);
@@ -574,6 +646,7 @@
 
   .metric-grid,
   .detail-list,
+  .document-guide,
   .protocol-panel {
     grid-template-columns: 1fr;
   }

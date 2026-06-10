@@ -65,8 +65,21 @@ export interface TimelineComponent extends BaseComponent {
 
 export interface RiskSummaryComponent extends BaseComponent {
   component: 'RiskSummary'
+  title?: BoundValue<string>
   level: Binding
   reasons: Binding
+}
+
+export interface ChecklistComponent extends BaseComponent {
+  component: 'Checklist'
+  title: BoundValue<string>
+  items: Binding
+}
+
+export interface DocumentGuideComponent extends BaseComponent {
+  component: 'DocumentGuide'
+  title: BoundValue<string>
+  items: Binding
 }
 
 export interface DetailListComponent extends BaseComponent {
@@ -83,7 +96,8 @@ export interface EvidenceFormComponent extends BaseComponent {
     id: string
     label: string
     placeholder?: string
-    type: 'text' | 'textarea' | 'file'
+    type: 'text' | 'textarea' | 'file' | 'select'
+    options?: string[]
   }>
 }
 
@@ -105,6 +119,8 @@ export type A2uiComponent =
   | MetricStripComponent
   | TimelineComponent
   | RiskSummaryComponent
+  | ChecklistComponent
+  | DocumentGuideComponent
   | DetailListComponent
   | EvidenceFormComponent
   | ActionBarComponent

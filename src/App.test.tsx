@@ -16,11 +16,16 @@ describe('App', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /KYC 失败/i }))
-    expect(screen.getByText('KYC 失败说明与补件')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /KYC 补件助手/i }))
+    expect(screen.getByText('身份认证需要补充材料')).toBeInTheDocument()
+    expect(screen.getByText('重新上传前检查')).toBeInTheDocument()
+    expect(screen.getByText('可接受的材料示例')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /提交工单/i }))
-    expect(within(screen.getByLabelText('action audit')).getByText(/ticket/))
-      .toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /请求人工复核/i }))
+    expect(
+      within(screen.getByLabelText('action audit')).getByText(
+        /kyc.request_manual_review/,
+      ),
+    ).toBeInTheDocument()
   })
 })

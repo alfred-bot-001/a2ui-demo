@@ -13,15 +13,28 @@ const baseComponents = (surfaceId: string): A2uiComponent[] => [
   {
     id: 'content',
     component: 'Stack',
-    children: [
-      'status',
-      'metrics',
-      'timeline',
-      'risk',
-      'details',
-      'evidence',
-      'actions',
-    ],
+    children:
+      surfaceId === 'kyc'
+        ? [
+            'status',
+            'metrics',
+            'timeline',
+            'risk',
+            'checklist',
+            'examples',
+            'details',
+            'evidence',
+            'actions',
+          ]
+        : [
+            'status',
+            'metrics',
+            'timeline',
+            'risk',
+            'details',
+            'evidence',
+            'actions',
+          ],
   },
   {
     id: 'status',
@@ -32,23 +45,42 @@ const baseComponents = (surfaceId: string): A2uiComponent[] => [
   {
     id: 'metrics',
     component: 'MetricStrip',
-    items: [
-      {
-        label: '链上确认',
-        value: { path: '/metrics/confirmations' },
-        status: { path: '/metrics/confirmationStatus' },
-      },
-      {
-        label: '内部状态',
-        value: { path: '/metrics/internalState' },
-        status: { path: '/metrics/internalStatus' },
-      },
-      {
-        label: 'SLA',
-        value: { path: '/metrics/sla' },
-        status: { path: '/metrics/slaStatus' },
-      },
-    ],
+    items:
+      surfaceId === 'kyc'
+        ? [
+            {
+              label: '当前步骤',
+              value: { path: '/metrics/currentStep' },
+              status: { path: '/metrics/currentStepStatus' },
+            },
+            {
+              label: '重新审核',
+              value: { path: '/metrics/reviewEta' },
+              status: { path: '/metrics/reviewEtaStatus' },
+            },
+            {
+              label: '下一动作',
+              value: { path: '/metrics/nextAction' },
+              status: { path: '/metrics/nextActionStatus' },
+            },
+          ]
+        : [
+            {
+              label: '链上确认',
+              value: { path: '/metrics/confirmations' },
+              status: { path: '/metrics/confirmationStatus' },
+            },
+            {
+              label: '内部状态',
+              value: { path: '/metrics/internalState' },
+              status: { path: '/metrics/internalStatus' },
+            },
+            {
+              label: 'SLA',
+              value: { path: '/metrics/sla' },
+              status: { path: '/metrics/slaStatus' },
+            },
+          ],
   },
   {
     id: 'timeline',
@@ -58,18 +90,43 @@ const baseComponents = (surfaceId: string): A2uiComponent[] => [
   {
     id: 'risk',
     component: 'RiskSummary',
+    title: surfaceId === 'kyc' ? '为什么没有通过' : '风险原因摘要',
     level: { path: '/risk/level' },
     reasons: { path: '/risk/reasons' },
   },
+  ...(surfaceId === 'kyc'
+    ? [
+        {
+          id: 'checklist',
+          component: 'Checklist',
+          title: '重新上传前检查',
+          items: { path: '/checklist' },
+        } satisfies A2uiComponent,
+        {
+          id: 'examples',
+          component: 'DocumentGuide',
+          title: '可接受的材料示例',
+          items: { path: '/documentExamples' },
+        } satisfies A2uiComponent,
+      ]
+    : []),
   {
     id: 'details',
     component: 'DetailList',
-    items: [
-      { label: 'Case ID', value: { path: '/case/id' } },
-      { label: '用户分层', value: { path: '/case/tier' } },
-      { label: '资产 / 网络', value: { path: '/case/assetNetwork' } },
-      { label: '最近动作', value: { path: '/case/latestAction' } },
-    ],
+    items:
+      surfaceId === 'kyc'
+        ? [
+            { label: 'Case ID', value: { path: '/case/id' } },
+            { label: '认证等级', value: { path: '/case/tier' } },
+            { label: '材料类型', value: { path: '/case/assetNetwork' } },
+            { label: '最近动作', value: { path: '/case/latestAction' } },
+          ]
+        : [
+            { label: 'Case ID', value: { path: '/case/id' } },
+            { label: '用户分层', value: { path: '/case/tier' } },
+            { label: '资产 / 网络', value: { path: '/case/assetNetwork' } },
+            { label: '最近动作', value: { path: '/case/latestAction' } },
+          ],
   },
   {
     id: 'evidence',
@@ -78,18 +135,30 @@ const baseComponents = (surfaceId: string): A2uiComponent[] => [
       surfaceId === 'kyc'
         ? [
             {
-              id: 'documentId',
-              label: '证件号码后四位',
-              placeholder: '例如 9281',
+              id: 'documentType',
+              label: '证件类型',
+              type: 'select',
+              options: ['护照', '身份证', '驾照'],
+            },
+            {
+              id: 'proofType',
+              label: '地址证明类型',
+              type: 'select',
+              options: ['银行账单', '水电账单', '政府信件'],
+            },
+            {
+              id: 'legalName',
+              label: '姓名拼写确认',
+              placeholder: '和证件保持完全一致',
               type: 'text',
             },
             {
               id: 'note',
               label: '用户补充说明',
-              placeholder: '让用户说明证件有效期、姓名拼写或居住地变化',
+              placeholder: '例如近期更换地址、姓名拼写差异或证件更新',
               type: 'textarea',
             },
-            { id: 'attachment', label: '材料截图', type: 'file' },
+            { id: 'attachment', label: '上传补充材料', type: 'file' },
           ]
         : [
             {
@@ -110,32 +179,60 @@ const baseComponents = (surfaceId: string): A2uiComponent[] => [
   {
     id: 'actions',
     component: 'ActionBar',
-    actions: [
-      {
-        id: 'rescan',
-        label: '重新触发扫描',
-        intent: 'primary',
-        icon: 'refresh',
-      },
-      {
-        id: 'ticket',
-        label: '提交工单',
-        intent: 'secondary',
-        icon: 'ticket',
-      },
-      {
-        id: 'upload',
-        label: '上传材料',
-        intent: 'secondary',
-        icon: 'upload',
-      },
-      {
-        id: 'escalate',
-        label: '升级人工',
-        intent: surfaceId === 'risk' ? 'danger' : 'secondary',
-        icon: 'escalate',
-      },
-    ],
+    actions:
+      surfaceId === 'kyc'
+        ? [
+            {
+              id: 'kyc.upload_document',
+              label: '重新上传材料',
+              intent: 'primary',
+              icon: 'upload',
+            },
+            {
+              id: 'kyc.update_profile',
+              label: '更新个人资料',
+              intent: 'secondary',
+              icon: 'shield',
+            },
+            {
+              id: 'kyc.view_document_examples',
+              label: '查看材料示例',
+              intent: 'secondary',
+              icon: 'ticket',
+            },
+            {
+              id: 'kyc.request_manual_review',
+              label: '请求人工复核',
+              intent: 'secondary',
+              icon: 'escalate',
+            },
+          ]
+        : [
+            {
+              id: 'rescan',
+              label: '重新触发扫描',
+              intent: 'primary',
+              icon: 'refresh',
+            },
+            {
+              id: 'ticket',
+              label: '提交工单',
+              intent: 'secondary',
+              icon: 'ticket',
+            },
+            {
+              id: 'upload',
+              label: '上传材料',
+              intent: 'secondary',
+              icon: 'upload',
+            },
+            {
+              id: 'escalate',
+              label: '升级人工',
+              intent: surfaceId === 'risk' ? 'danger' : 'secondary',
+              icon: 'escalate',
+            },
+          ],
   },
 ]
 
@@ -217,8 +314,9 @@ export const scenarios: SupportScenario[] = [
   },
   {
     id: 'kyc',
-    title: 'KYC 失败',
-    customerMessage: '我提交了身份认证，但是系统一直说审核失败，为什么？',
+    title: 'KYC 补件助手',
+    customerMessage:
+      '我身份认证一直失败，为什么？我已经上传过证件了，下一步该怎么做？',
     category: 'KYC',
     severity: 'medium',
     envelopes: [
@@ -245,46 +343,88 @@ export const scenarios: SupportScenario[] = [
           value: {
             case: {
               id: 'SUP-984401',
-              title: 'KYC 失败说明与补件',
-              subtitle: 'Agent 返回可解释原因，不暴露具体审核规则。',
-              statusLabel: '需要用户补件',
+              title: '身份认证需要补充材料',
+              subtitle:
+                '已通过人脸验证，地址证明需要重新提交。下面是可立即处理的步骤。',
+              statusLabel: '待用户补件',
               status: 'warning',
-              tier: 'Retail',
-              assetNetwork: 'Identity / Level 2',
-              latestAction: '证件图片质量不足，地址信息不完整',
+              tier: 'Level 2 身份认证',
+              assetNetwork: '护照 + 地址证明',
+              latestAction: '地址证明文件日期过期，姓名拼写需要确认',
             },
             metrics: {
-              confirmations: 'N/A',
-              confirmationStatus: 'neutral',
-              internalState: 'manual-review',
-              internalStatus: 'warning',
-              sla: '6h',
-              slaStatus: 'ok',
+              currentStep: '地址验证',
+              currentStepStatus: 'warning',
+              reviewEta: '10-30 分钟',
+              reviewEtaStatus: 'ok',
+              nextAction: '重新上传',
+              nextActionStatus: 'warning',
             },
             timeline: [
               {
-                time: '08:13',
-                title: '用户提交认证',
-                detail: '证件正反面、自拍、地址证明上传完成。',
+                time: '10:12',
+                title: '提交身份材料',
+                detail: '护照、人脸验证和地址证明已提交。',
                 status: 'ok',
               },
               {
-                time: '08:18',
-                title: '自动审核未通过',
-                detail: '可解释层提示为图片清晰度和地址字段不完整。',
-                status: 'warning',
+                time: '10:14',
+                title: '证件读取完成',
+                detail: '证件号码和姓名已成功识别。',
+                status: 'ok',
               },
               {
-                time: '08:20',
-                title: '等待补充材料',
-                detail: '建议请求用户重传清晰证件与地址证明。',
+                time: '10:16',
+                title: '人脸验证通过',
+                detail: '自拍与证件照片匹配，当前无需重新做人脸验证。',
+                status: 'ok',
+              },
+              {
+                time: '10:18',
+                title: '地址证明需要补充',
+                detail: '文件日期超过 90 天，且姓名拼写与账户资料不完全一致。',
                 status: 'neutral',
               },
             ],
             risk: {
-              level: '中风险',
-              reasons: ['文档信息不完整', '图片质量低', '没有命中制裁或高危地区规则'],
+              level: '未通过原因',
+              reasons: [
+                '地址证明文件日期超过 90 天',
+                '文件边缘被裁切，地址信息不完整',
+                '姓名拼写与账户资料存在空格差异',
+              ],
             },
+            checklist: [
+              {
+                title: '文件日期在 90 天内',
+                detail: '银行账单、水电账单或政府信件需要显示近期日期。',
+                status: 'warning',
+              },
+              {
+                title: '姓名和账户资料一致',
+                detail: '大小写、空格、中间名需要和证件或资料保持一致。',
+                status: 'warning',
+              },
+              {
+                title: '图片四角完整',
+                detail: '不要裁切边缘，避免反光、遮挡和二次压缩。',
+                status: 'neutral',
+              },
+            ],
+            documentExamples: [
+              {
+                title: '银行账单',
+                detail: '需包含姓名、完整地址、银行名称和 90 天内日期。',
+              },
+              {
+                title: '水电账单',
+                detail: '电费、水费、燃气账单均可，截图需完整显示页眉和地址。',
+              },
+              {
+                title: '政府信件',
+                detail: '税务、居住证明或官方机构信件，需显示签发机构。',
+              },
+            ],
           },
         },
       },
