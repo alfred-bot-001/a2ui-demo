@@ -21,9 +21,9 @@ interface AuditEvent {
 }
 
 function severityLabel(severity: 'low' | 'medium' | 'high') {
-  if (severity === 'high') return 'High'
-  if (severity === 'medium') return 'Medium'
-  return 'Low'
+  if (severity === 'high') return '紧急'
+  if (severity === 'medium') return '提醒'
+  return '普通'
 }
 
 function App() {
@@ -66,15 +66,15 @@ function App() {
         <header className="brand-bar">
           <div className="brand-mark">A2</div>
           <div>
-            <strong>Support Copilot</strong>
-            <span>A2UI protocol demo</span>
+            <strong>Account Help</strong>
+            <span>身份认证与账户问题助手</span>
           </div>
         </header>
 
         <section className="rail-section">
           <div className="section-title">
             <MessageSquareText aria-hidden="true" size={16} />
-            <span>用户问题</span>
+            <span>我的问题</span>
           </div>
           <div className="scenario-list">
             {scenarios.map((scenario) => (
@@ -107,7 +107,7 @@ function App() {
           </div>
           <div className="chat-bubble agent">
             <Bot aria-hidden="true" size={16} />
-            <p>已生成 case-specific A2UI surface，包含状态、风险摘要、补件表单和可审计操作。</p>
+            <p>我整理好了你可以直接处理的步骤。先看原因，再按要求补充材料。</p>
           </div>
         </section>
       </aside>
@@ -120,7 +120,7 @@ function App() {
         <section className="inspector-card">
           <div className="section-title">
             <ClipboardList aria-hidden="true" size={16} />
-            <span>Envelope Stream</span>
+            <span>A2UI Envelope</span>
           </div>
           <pre>{JSON.stringify(activeScenario.envelopes, null, 2)}</pre>
         </section>
@@ -128,10 +128,10 @@ function App() {
         <section className="inspector-card audit-card" aria-label="action audit">
           <div className="section-title">
             <Activity aria-hidden="true" size={16} />
-            <span>Action Audit</span>
+            <span>Action Events</span>
           </div>
           {auditEvents.length === 0 ? (
-            <p className="empty-state">点击 surface 里的操作按钮，查看回传事件。</p>
+            <p className="empty-state">点击界面按钮，查看 A2UI action 回传事件。</p>
           ) : (
             <ul className="audit-list">
               {auditEvents.map((event) => (

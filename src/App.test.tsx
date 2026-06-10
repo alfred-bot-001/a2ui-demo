@@ -20,8 +20,10 @@ describe('App', () => {
     expect(screen.getByText('身份认证需要补充材料')).toBeInTheDocument()
     expect(screen.getByText('重新上传前检查')).toBeInTheDocument()
     expect(screen.getByText('可接受的材料示例')).toBeInTheDocument()
+    expect(screen.getByText('认证概况')).toBeInTheDocument()
+    expect(screen.queryByText('Case ID')).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /请求人工复核/i }))
+    await user.click(screen.getByRole('button', { name: /联系人工客服/i }))
     expect(
       within(screen.getByLabelText('action audit')).getByText(
         /kyc.request_manual_review/,

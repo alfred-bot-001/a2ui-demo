@@ -6,6 +6,7 @@ const baseComponents = (surfaceId: string): A2uiComponent[] => [
   {
     id: 'root',
     component: 'Surface',
+    eyebrow: { path: '/case/contextLabel' },
     title: { path: '/case/title' },
     subtitle: { path: '/case/subtitle' },
     child: 'content',
@@ -85,12 +86,13 @@ const baseComponents = (surfaceId: string): A2uiComponent[] => [
   {
     id: 'timeline',
     component: 'Timeline',
+    title: surfaceId === 'kyc' ? '认证进度' : '状态时间线',
     items: { path: '/timeline' },
   },
   {
     id: 'risk',
     component: 'RiskSummary',
-    title: surfaceId === 'kyc' ? '为什么没有通过' : '风险原因摘要',
+    title: surfaceId === 'kyc' ? '需要调整的地方' : '风险原因摘要',
     level: { path: '/risk/level' },
     reasons: { path: '/risk/reasons' },
   },
@@ -113,13 +115,14 @@ const baseComponents = (surfaceId: string): A2uiComponent[] => [
   {
     id: 'details',
     component: 'DetailList',
+    title: surfaceId === 'kyc' ? '认证概况' : 'Case 上下文',
     items:
       surfaceId === 'kyc'
         ? [
-            { label: 'Case ID', value: { path: '/case/id' } },
             { label: '认证等级', value: { path: '/case/tier' } },
-            { label: '材料类型', value: { path: '/case/assetNetwork' } },
-            { label: '最近动作', value: { path: '/case/latestAction' } },
+            { label: '需要补充', value: { path: '/case/assetNetwork' } },
+            { label: '预计重新审核', value: { path: '/metrics/reviewEta' } },
+            { label: '下一步', value: { path: '/case/latestAction' } },
           ]
         : [
             { label: 'Case ID', value: { path: '/case/id' } },
@@ -131,6 +134,7 @@ const baseComponents = (surfaceId: string): A2uiComponent[] => [
   {
     id: 'evidence',
     component: 'EvidenceForm',
+    title: surfaceId === 'kyc' ? '提交补充材料' : '补充材料',
     fields:
       surfaceId === 'kyc'
         ? [
@@ -202,7 +206,7 @@ const baseComponents = (surfaceId: string): A2uiComponent[] => [
             },
             {
               id: 'kyc.request_manual_review',
-              label: '请求人工复核',
+              label: '联系人工客服',
               intent: 'secondary',
               icon: 'escalate',
             },
@@ -343,14 +347,15 @@ export const scenarios: SupportScenario[] = [
           value: {
             case: {
               id: 'SUP-984401',
+              contextLabel: '身份认证帮助',
               title: '身份认证需要补充材料',
               subtitle:
-                '已通过人脸验证，地址证明需要重新提交。下面是可立即处理的步骤。',
-              statusLabel: '待用户补件',
+                '你的证件和人脸验证已经通过，只需要重新提交一份符合要求的地址证明。',
+              statusLabel: '需要补充地址证明',
               status: 'warning',
               tier: 'Level 2 身份认证',
-              assetNetwork: '护照 + 地址证明',
-              latestAction: '地址证明文件日期过期，姓名拼写需要确认',
+              assetNetwork: '地址证明',
+              latestAction: '上传一份 90 天内、姓名和地址清晰可见的文件',
             },
             metrics: {
               currentStep: '地址验证',
@@ -387,11 +392,11 @@ export const scenarios: SupportScenario[] = [
               },
             ],
             risk: {
-              level: '未通过原因',
+              level: '请重新提交地址证明',
               reasons: [
-                '地址证明文件日期超过 90 天',
-                '文件边缘被裁切，地址信息不完整',
-                '姓名拼写与账户资料存在空格差异',
+                '当前文件日期超过 90 天，不能用于本次认证',
+                '图片边缘被裁切，地址没有完整显示',
+                '姓名拼写需要和账户资料保持一致',
               ],
             },
             checklist: [

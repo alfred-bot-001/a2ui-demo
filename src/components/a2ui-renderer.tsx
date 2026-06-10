@@ -170,6 +170,9 @@ function renderByType(
 
   switch (component.component) {
     case 'Surface': {
+      const eyebrow = component.eyebrow
+        ? resolveValue(component.eyebrow, dataModel, '')
+        : ''
       const title = resolveValue(component.title, dataModel, '')
       const subtitle = component.subtitle
         ? resolveValue(component.subtitle, dataModel, '')
@@ -179,11 +182,10 @@ function renderByType(
         <article className="surface">
           <header className="surface-header">
             <div>
-              <p className="eyebrow">{surface.catalogId}</p>
+              {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
               <h1>{title}</h1>
               <p>{subtitle}</p>
             </div>
-            <span className="surface-id">{surface.surfaceId}</span>
           </header>
           {renderComponent(component.child, surface, onAction)}
         </article>
@@ -228,7 +230,7 @@ function renderByType(
 
     case 'MetricStrip':
       return (
-        <section className="metric-grid" aria-label="case metrics">
+        <section className="metric-grid" aria-label="status metrics">
           {component.items.map((item) => {
             const status = item.status
               ? resolveValue(item.status, dataModel, 'neutral')
@@ -245,10 +247,13 @@ function renderByType(
       )
 
     case 'Timeline': {
+      const title = component.title
+        ? resolveValue(component.title, dataModel, '状态时间线')
+        : '状态时间线'
       const items = asTimelineItems(resolveValue(component.items, dataModel, []))
       return (
         <section className="panel">
-          <h2>状态时间线</h2>
+          <h2>{title}</h2>
           <ol className="timeline">
             {items.map((item) => (
               <li className={item.status} key={`${item.time}-${item.title}`}>
@@ -331,7 +336,11 @@ function renderByType(
     case 'DetailList':
       return (
         <section className="panel">
-          <h2>Case 上下文</h2>
+          <h2>
+            {component.title
+              ? resolveValue(component.title, dataModel, '')
+              : 'Case 上下文'}
+          </h2>
           <dl className="detail-list">
             {component.items.map((item) => (
               <div key={item.label}>
@@ -346,7 +355,11 @@ function renderByType(
     case 'EvidenceForm':
       return (
         <section className="panel">
-          <h2>补充材料</h2>
+          <h2>
+            {component.title
+              ? resolveValue(component.title, dataModel, '')
+              : '补充材料'}
+          </h2>
           <form className="evidence-form">
             {component.fields.map((field) => (
               <label key={field.id}>
@@ -378,7 +391,7 @@ function renderByType(
 
     case 'ActionBar':
       return (
-        <section className="action-bar" aria-label="case actions">
+        <section className="action-bar" aria-label="available actions">
           {component.actions.map((action) => {
             const Icon = action.icon ? actionIcons[action.icon] : CheckCircle2
             return (

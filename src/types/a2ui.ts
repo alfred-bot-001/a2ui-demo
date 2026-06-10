@@ -26,6 +26,7 @@ interface BaseComponent {
 
 export interface SurfaceComponent extends BaseComponent {
   component: 'Surface'
+  eyebrow?: BoundValue<string>
   title: BoundValue<string>
   subtitle?: BoundValue<string>
   child: string
@@ -60,6 +61,7 @@ export interface MetricStripComponent extends BaseComponent {
 
 export interface TimelineComponent extends BaseComponent {
   component: 'Timeline'
+  title?: BoundValue<string>
   items: Binding
 }
 
@@ -84,6 +86,7 @@ export interface DocumentGuideComponent extends BaseComponent {
 
 export interface DetailListComponent extends BaseComponent {
   component: 'DetailList'
+  title?: BoundValue<string>
   items: Array<{
     label: string
     value: BoundValue<string>
@@ -92,6 +95,7 @@ export interface DetailListComponent extends BaseComponent {
 
 export interface EvidenceFormComponent extends BaseComponent {
   component: 'EvidenceForm'
+  title?: BoundValue<string>
   fields: Array<{
     id: string
     label: string
